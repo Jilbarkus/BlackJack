@@ -1,0 +1,64 @@
+﻿/*
+Notes
+nice Console Menu videos: 
+https://www.youtube.com/watch?v=9y8VzAn3piw
+https://www.youtube.com/watch?v=qAWhGEPMlS8
+
+Tarodev Generics video:
+https://www.youtube.com/watch?v=YEHbjy3JBtE&list=TLPQMDkwOTIwMjNw51iG6GOL5Q&index=1
+
+Console Class functions:
+https://learn.microsoft.com/en-us/dotnet/api/system.console?view=net-7.0
+https://learn.microsoft.com/en-us/dotnet/api/system.console.clear?view=net-7.0
+
+C# keywords:
+https://learn.microsoft.com/en-us/dotnet/csharp/language-reference/keywords/
+
+text to ascii generator:
+http://patorjk.com/software/taag/
+a lot of the text is using font: "Big"
+
+getting types from Assemblies:
+https://stackoverflow.com/questions/67079586/get-all-classes-that-implement-an-interface-and-call-a-function-in-net-core
+
+SSS podcasts:
+https://soundcloud.com/seeksicksound/sets/podcasts
+
+Ask the Dealer: What Does “Split” and “Double Down” Mean in Blackjack?
+https://www.islandresortandcasino.com/blog/ask-the-dealer-what-does-double-down-mean-in-blackjack
+
+Round 1: 1 card face up each
+Round 2: 1 card for player only, face down card for dealer
+Round x: player hits until stays
+last round: dealer flips up card, then if under 16 they keep hitting until stay or bust
+
+
+winnings:
+1.5X for hitting blackjack with 2 cards on 2nd round
+2X for dealer bust or higher yield than dealer
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+*/
