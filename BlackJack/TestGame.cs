@@ -11,8 +11,10 @@ namespace CardGames
         public bool Run(ref PlayerSave player)
         {
             Console.Clear();
-            return BestHandChooserTest();
+
             //return EmptyDeckValueTest();
+            //return BestHandChooserTest();
+            return SplitViabilityTest();
         }
 
         private bool BestHandChooserTest()
@@ -37,6 +39,22 @@ namespace CardGames
                 }
                 else return true;
             }
+            else return true;
+        }
+
+        private bool SplitViabilityTest()
+        {
+            Console.Clear();
+            new string[] { 
+                $"Two Aces Splittable: {BlackJack.CardsAreSplittable(new NumberCard(aCard.Suit.Spade, 1), new NumberCard(aCard.Suit.Heart, 1))}",
+                $"Two 10s Splittable: {BlackJack.CardsAreSplittable(new NumberCard(aCard.Suit.Spade, 10), new NumberCard(aCard.Suit.Heart, 10))}",
+                $"An ace and a 10 Splittable: {BlackJack.CardsAreSplittable(new NumberCard(aCard.Suit.Spade, 10), new NumberCard(aCard.Suit.Heart, 1))}",
+                $"Two Kings: {BlackJack.CardsAreSplittable(new FaceCard(aCard.Suit.Spade, FaceCard.Face.King), new FaceCard(aCard.Suit.Diamond, FaceCard.Face.King))}",
+                $"King and Jack: {BlackJack.CardsAreSplittable(new FaceCard(aCard.Suit.Spade, FaceCard.Face.Jack), new FaceCard(aCard.Suit.Diamond, FaceCard.Face.King))}",
+                $"Ace and Jack: {BlackJack.CardsAreSplittable(new NumberCard(aCard.Suit.Spade, 1), new FaceCard(aCard.Suit.Diamond, FaceCard.Face.King))}"
+            }.PrintArrayToConsole(GlobalFunctions.ConsoleCursorLocation, JustifyX.Center, JustifyY.Center);
+            char keyToChar = GetUserKeyToChar();
+            if (keyToChar == 'X' || Char.ToUpper(keyToChar) == 'X') return false;
             else return true;
         }
 
