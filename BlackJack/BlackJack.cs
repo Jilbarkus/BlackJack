@@ -4,47 +4,47 @@ namespace CardGames
 {
     internal class BlackJack: IGame
     {
-        private GameState state = GameState.Betting;
-        //private string[] lastOutput = new string[0];
-        private BJData? bjData = new BJData(8);
-        private BJSettings bjSettings = new BJSettings();
+        private GameState _state = GameState.Betting;
+        private BJData? _bjData = new BJData(8);
+        private BJSettings _bjSettings = new BJSettings();
         
         public enum GameState { Betting, Dealing}
         public bool Run(ref PlayerSave player)
         {
+            // in case there is no game start one
+            if (_bjData == null) { resetBJGame(); changeState(GameState.Betting); return true; }
             string[] currentOutput = new string[0];
-            switch (state)
+            switch (_state)
             {
                 case GameState.Betting:
                     currentOutput = new string[] {
-                        $"Please place your bets for the next hand, the table minimum is ${bjSettings.minimumBet}",
-                        $"Current Bet: ${bjData?.bettingAmmountInput:0}           Funds: {player.Cash}"
+                        $"Please place your bets for the next hand, the table minimum is ${_bjSettings.minimumBet}",
+                        $"Current Bet: ${_bjData?.bettingAmmountInput:0}           Funds: {player.Cash}"
                     };
                     bool[] hiLighted = new bool[] { false, false, false, false };
-                    string[] buttons = GlobalFunctions.CreateButtonStringArray(new string[] { $"\u2191 Add Bet +{bjSettings.betIncrement}", "\u2192 Start Dealing", "\u2193 Reduce Bet   ", $"x Exit to Menu " }, ref hiLighted, GlobalFunctions.CursorMaxX);
+                    string[] buttons = GlobalFunctions.CreateButtonStringArray(new string[] { $"\u2191 Add Bet +{_bjSettings.betIncrement}", "\u2192 Start Dealing", "\u2193 Reduce Bet   ", $"x Exit to Menu " }, ref hiLighted, GlobalFunctions.CursorMaxX);
                     for (int i = 0; i < buttons.Length; i++) currentOutput = currentOutput.Append(buttons[i]).ToArray();
-                    /*if (!currentOutput.StringArraysAreSameLength(lastOutput)) */Console.Clear();
-                    //lastOutput = currentOutput;
+                    Console.Clear();
                     currentOutput.PrintArrayToConsole(new IntVector2(Console.CursorLeft, Console.CursorTop), JustifyX.Center, JustifyY.Center);
 
                     switch (getBettingInput())
                     {
                         case 0: return false;
                         case 1:
-                            if (player.Cash >= (bjSettings.betIncrement + bjData.bettingAmmountInput)) bjData.bettingAmmountInput += bjSettings.betIncrement;
+                            if (player.Cash >= (_bjSettings.betIncrement + _bjData.bettingAmmountInput)) _bjData.bettingAmmountInput += _bjSettings.betIncrement;
                             break;
                         case 2:
-                            if (bjData.bettingAmmountInput >= bjSettings.minimumBet)
+                            if (_bjData.bettingAmmountInput >= _bjSettings.minimumBet)
                             {
                                 //resetBJGame();
-                                player.AddCash(-bjData.bettingAmmountInput);
-                                bjData.playerTableBet = bjData.bettingAmmountInput;
+                                player.AddCash(-_bjData.bettingAmmountInput);
+                                _bjData.playerTableBet = _bjData.bettingAmmountInput;
                                 Console.Clear();
                                 changeState(GameState.Dealing);
                             }
                             break;
                         case 3:
-                            if (bjData.bettingAmmountInput - bjSettings.betIncrement >= 0) bjData.bettingAmmountInput -= bjSettings.betIncrement;
+                            if (_bjData.bettingAmmountInput - _bjSettings.betIncrement >= 0) _bjData.bettingAmmountInput -= _bjSettings.betIncrement;
                             break;
                         default: break;
                     }
@@ -54,40 +54,45 @@ namespace CardGames
                 case GameState.Dealing:
                     // does the player get to input this round?
                     bool bTakeInput = true;
-                    // in case there is no game start one
-                    if (bjData == null) resetBJGame();
                     // how much player has bet
-                    Decimal Bet = bjData.bettingAmmountInput;
+                    Decimal Bet = _bjData.bettingAmmountInput;
                     // Case: Round 1
-                    if (bjData.dealerHand.Length == 0)
+                    if (_bjData.dealerHand.Length == 0)
                     {
-                        bjData.dealerHand = bjData.dealerHand.Append(Draw()).ToArray();
-                        bjData.playerHandA = bjData.playerHandA.Append(Draw()).ToArray();
+                        _bjData.dealerHand = _bjData.dealerHand.Append(Draw()).ToArray();
+                        _bjData.playerHandA = _bjData.playerHandA.Append(Draw()).ToArray();
                         bTakeInput = false;
                     }
                     // Case: Round 2
-                    else if (bjData.dealerHand.Length == 1 && bjData.playerHandA.Length == 1)
+                    else if (_bjData.dealerHand.Length == 1 && _bjData.playerHandA.Length == 1)
                     {
-                        bjData.playerHandA = bjData.playerHandA.Append(Draw()).ToArray();
+                        _bjData.playerHandA = _bjData.playerHandA.Append(Draw()).ToArray();
                         bTakeInput = false;
 
                     }
                     // Case: Final Round
-                    else if (bjData.dealerHand.Length > 1)
+                    else if (_bjData.dealerHand.Length > 1)
                     {
                         bTakeInput = false;
                     }
                     // calculate player values
-                    int dealerHand = getBlackJackValue(bjData.dealerHand);
-                    aCard[] combinedPlayerHands = new aCard[bjData.playerHandA.Length + bjData.playerHandB.Length];
-                    Array.Copy(bjData.playerHandA, combinedPlayerHands, bjData.playerHandA.Length);
-                    Array.Copy(bjData.playerHandB, 0, combinedPlayerHands, bjData.playerHandA.Length, bjData.playerHandB.Length);
-                    int playerValue = getBlackJackValue(combinedPlayerHands);
+                    int dealerHand = GetBlackJackValue(_bjData.dealerHand);
+                    aCard[] combinedPlayerHands = new aCard[_bjData.playerHandA.Length + _bjData.playerHandB.Length];
+                    Array.Copy(_bjData.playerHandA, combinedPlayerHands, _bjData.playerHandA.Length);
+                    Array.Copy(_bjData.playerHandB, 0, combinedPlayerHands, _bjData.playerHandA.Length, _bjData.playerHandB.Length);
+                    // ^^ OLD ^^
+
+                    int playerHandA = GetBlackJackValue(_bjData.playerHandA);
+                    int playerHandB = GetBlackJackValue(_bjData.playerHandB);
+                    int bestPlayerValue = GetBestBlackJackValue(playerHandA, playerHandB);
+
+                    // ^^ NEW ^^
+                    //int playerValue = GetBlackJackValue(combinedPlayerHands);
 
                     // Case: Player Bust
-                    if (bjData.dealerHand.Length == 1 && playerValue >= 21)
+                    if (_bjData.dealerHand.Length == 1 && bestPlayerValue >= 21)
                     {
-                        bjData.dealerHand = bjData.dealerHand.Append(Draw()).ToArray();
+                        _bjData.dealerHand = _bjData.dealerHand.Append(Draw()).ToArray();
                         return true;
                     }
 
@@ -97,12 +102,12 @@ namespace CardGames
                     // dealer value 
                     currentOutput = currentOutput.Append($"Dealer's hand: {dealerHand}").ToArray();
                     // dealer cards 
-                    for (int i = 0; i < bjData.dealerHand.Length; i++)
+                    for (int i = 0; i < _bjData.dealerHand.Length; i++)
                     {
-                        currentOutput = currentOutput.AddStringBlockHorizontal(bjData.dealerHand[i].CardToString(), GlobalFunctions.CursorMaxX);
+                        currentOutput = currentOutput.AddStringBlockHorizontal(_bjData.dealerHand[i].CardToString(), GlobalFunctions.CursorMaxX);
                     }
                     // dealer's face down card
-                    if (bjData.dealerHand.Length == 1)
+                    if (_bjData.dealerHand.Length == 1)
                     {
                         currentOutput = currentOutput.AddStringBlockHorizontal(GlobalFunctions.CardBack, GlobalFunctions.CursorMaxX);
                     }
@@ -110,16 +115,16 @@ namespace CardGames
                     //currentOutput = currentOutput.AddStringBlockHorizontal(new string[] { "         " }, GlobalFunctions.CursorMaxX);
                     currentOutput = currentOutput.Append("      ").ToArray();
                     // player cards 
-                    for (int i = 0; i < bjData.playerHandA.Length; i++)
+                    for (int i = 0; i < _bjData.playerHandA.Length; i++)
                     {
-                        currentOutput = currentOutput.AddStringBlockHorizontal(bjData.playerHandA[i].CardToString(), GlobalFunctions.CursorMaxX);
+                        currentOutput = currentOutput.AddStringBlockHorizontal(_bjData.playerHandA[i].CardToString(), GlobalFunctions.CursorMaxX);
                     }
-                    for (int i = 0; i < bjData.playerHandB.Length; i++)
+                    for (int i = 0; i < _bjData.playerHandB.Length; i++)
                     {
-                        currentOutput = currentOutput.AddStringBlockHorizontal(bjData.playerHandB[i].CardToString(), GlobalFunctions.CursorMaxX);
+                        currentOutput = currentOutput.AddStringBlockHorizontal(_bjData.playerHandB[i].CardToString(), GlobalFunctions.CursorMaxX);
                     }
                     // player value display
-                    currentOutput = currentOutput.Append($"{player.Name}'s hand: {playerValue}").ToArray();
+                    currentOutput = currentOutput.Append($"{player.Name}'s hand: {bestPlayerValue}").ToArray();
                     if (bTakeInput)
                     {
                         currentOutput.PrintArrayToConsole(new IntVector2(Console.CursorLeft, Console.CursorTop), JustifyX.Center, JustifyY.Top);
@@ -132,49 +137,49 @@ namespace CardGames
                     //////////// endgame ////////////
                     ///
                     // Case: Last round
-                    else if (bjData.dealerHand.Length > 1)
+                    else if (_bjData.dealerHand.Length > 1)
                     {
-                        bool bEndGame = dealerHand > playerValue || dealerHand >= 16;
+                        bool bEndGame = dealerHand > bestPlayerValue || dealerHand >= 16;
                         decimal playerCashBuffer = player.Cash;
                         if (bEndGame)
                         {
                             //dead heat
-                            if ((dealerHand > 21 && playerValue > 21) || dealerHand == playerValue)
+                            if ((dealerHand > 21 && bestPlayerValue > 21) || dealerHand == bestPlayerValue)
                             {
                                 currentOutput = currentOutput.AddStringBlockHorizontal(GlobalFunctions.DeadHeatStringBlock.StringMultiLineToStringArray());
-                                player.AddCash(bjData.bettingAmmountInput);
+                                player.AddCash(_bjData.bettingAmmountInput);
                             }
                             // blackjack
-                            else if (playerValue == 21)
+                            else if (bestPlayerValue == 21)
                             {
                                 currentOutput = currentOutput.AddStringBlockHorizontal(GlobalFunctions.BlackJackStringBlock.StringMultiLineToStringArray());
                                 // blackjack without hitting
-                                if (bjData.playerHandA.Length + bjData.playerHandB.Length == 2)
+                                if (_bjData.playerHandA.Length + _bjData.playerHandB.Length == 2)
                                 {
                                     
-                                    player.AddCash(1.5m * bjData.bettingAmmountInput);
+                                    player.AddCash(1.5m * _bjData.bettingAmmountInput);
                                 }
                                 else
                                 {
-                                    player.AddCash(2m * bjData.bettingAmmountInput);
+                                    player.AddCash(2m * _bjData.bettingAmmountInput);
                                 }
                             }
                             // dealer bust
                             else if (dealerHand > 21)
                             {
                                 currentOutput = currentOutput.AddStringBlockHorizontal(GlobalFunctions.DealerBustStringBlock.StringMultiLineToStringArray());
-                                player.AddCash(2m * bjData.bettingAmmountInput);
+                                player.AddCash(2m * _bjData.bettingAmmountInput);
                             }
                             // player bust
-                            else if (playerValue > 21)
+                            else if (bestPlayerValue > 21)
                             {
                                 currentOutput = currentOutput.AddStringBlockHorizontal(GlobalFunctions.BustStringBlock2.StringMultiLineToStringArray());
                             }
                             // player winning hand - needs change
-                            else if (playerValue > dealerHand)
+                            else if (bestPlayerValue > dealerHand)
                             {
                                 currentOutput = currentOutput.AddStringBlockHorizontal(GlobalFunctions.WinningHandStringBlock.StringMultiLineToStringArray());
-                                player.AddCash(2m * bjData.bettingAmmountInput);
+                                player.AddCash(2m * _bjData.bettingAmmountInput);
                             }
                             // dealer winning hand
                             else
@@ -194,7 +199,7 @@ namespace CardGames
                             // TODO: display player cash or winnings
                             Console.Clear();
                             currentOutput.PrintArrayToConsole(new IntVector2(Console.CursorLeft, Console.CursorTop), JustifyX.Center, JustifyY.Top);
-                            new string[3] { $"Bank: ${player.Cash}",$"Bet:{bjData.bettingAmmountInput}",$"Winnings: ${player.Cash - playerCashBuffer - bjData.bettingAmmountInput}" }.PrintArrayToConsole(new IntVector2(Console.CursorLeft, Console.CursorTop), JustifyX.Right, JustifyY.Top);
+                            new string[3] { $"Bank: ${player.Cash}",$"Bet:{_bjData.bettingAmmountInput}",$"Winnings: ${player.Cash - playerCashBuffer - _bjData.bettingAmmountInput}" }.PrintArrayToConsole(new IntVector2(Console.CursorLeft, Console.CursorTop), JustifyX.Right, JustifyY.Top);
                             switch (GlobalFunctions.GetKeyPress(
                         new ConsoleKeyInfo[] {
                             new ConsoleKeyInfo('x', ConsoleKey.X, false, false, false),
@@ -217,10 +222,10 @@ namespace CardGames
 
                                 // same again
                                 default:
-                                    decimal prevBet = bjData.bettingAmmountInput;
+                                    decimal prevBet = _bjData.bettingAmmountInput;
                                     resetBJGame();
                                     player.AddCash(-prevBet);
-                                    bjData.bettingAmmountInput = prevBet;
+                                    _bjData.bettingAmmountInput = prevBet;
                                     changeState(GameState.Dealing);
                                     Console.Clear();
                                     //break;
@@ -233,7 +238,7 @@ namespace CardGames
                     if (!bTakeInput) currentOutput.PrintArrayToConsole(new IntVector2(Console.CursorLeft, Console.CursorTop), JustifyX.Center, JustifyY.Top);
 
 
-                    new string[2] { $"Bank: ${player.Cash}", $"Bet: ${bjData.bettingAmmountInput}" }.PrintArrayToConsole(new IntVector2(Console.CursorLeft, Console.CursorTop), JustifyX.Right, JustifyY.Top);
+                    new string[2] { $"Bank: ${player.Cash}", $"Bet: ${_bjData.bettingAmmountInput}" }.PrintArrayToConsole(new IntVector2(Console.CursorLeft, Console.CursorTop), JustifyX.Right, JustifyY.Top);
 
                     //////////// input   ////////////
                     ///
@@ -251,16 +256,16 @@ namespace CardGames
                                 return false;
                             // hit me
                             case 1:
-                                bjData.playerHandA = bjData.playerHandA.Append(Draw()).ToArray();
+                                _bjData.playerHandA = _bjData.playerHandA.Append(Draw()).ToArray();
                                 return true;
                             // stay
                             default:
-                                bjData.dealerHand = bjData.dealerHand.Append(Draw()).ToArray();
+                                _bjData.dealerHand = _bjData.dealerHand.Append(Draw()).ToArray();
                                 return true;
                         }
                     }
                     // Case: any round but the last round
-                    else if (bjData.dealerHand.Length == 1)
+                    else if (_bjData.dealerHand.Length == 1)
                     {
                         Console.Clear();
                         return true;
@@ -271,14 +276,14 @@ namespace CardGames
                         // dealer hits if under 16
                         if (dealerHand < 16)
                         {
-                            bjData.dealerHand = bjData.dealerHand.Append(Draw()).ToArray();
+                            _bjData.dealerHand = _bjData.dealerHand.Append(Draw()).ToArray();
                         }
                         return true;
                     }
 
                     aCard Draw()
                     {
-                        bjData.deck = bjData.deck.Pop(out aCard card);
+                        _bjData.deck = _bjData.deck.Pop(out aCard card);
                         return card;
                     }
 
@@ -360,10 +365,10 @@ namespace CardGames
 
         private void resetBJGame()
         {
-            bjData = new BJData();
+            _bjData = new BJData();
         }
 
-        private int getBlackJackValue(in aCard[] handIn)
+        public static int GetBlackJackValue(in aCard[] handIn)
         {
             int output = 0;
             // aces are added up at the end
@@ -427,11 +432,29 @@ namespace CardGames
             return output + acesCount;
         }
 
+        public static int GetBestBlackJackValue(int handA, int handB)
+        {
+            //both bust or both empty
+            if ((handA > 21 && handB > 21) || (handA <= 0 && handB <= 0)) return handA;
+            // one bust or empty
+            else if (handA <= 0) return handB;
+            else if (handB <= 0) return handA;
+            else if (handA > 21) return handB;
+            else if (handB > 21) return handA;
+            else
+            {
+                int distFromTargetA = Math.Abs(21 - handA);
+                int distFromTargetB = Math.Abs(21 - handB);
+                if (distFromTargetA <= distFromTargetB) return handA;
+                else return handB;
+            }
+        }
+
         private void displayWelcomeMessage()
         {
             Console.Clear();
             string welcome = $"\nWelcome to the BlackJack table {Environment.UserName}\n";
-            string instruction = $"\nPress 'x' at any time to exit.\nPlease place your bets for the next hand, the table minimum is ${bjSettings.minimumBet}\n";
+            string instruction = $"\nPress 'x' at any time to exit.\nPlease place your bets for the next hand, the table minimum is ${_bjSettings.minimumBet}\n";
             Console.WriteLine(welcome);
             Console.WriteLine(instruction);
         }
@@ -442,7 +465,7 @@ namespace CardGames
         {
             switch (targetState)
             {
-                default: state = targetState;
+                default: _state = targetState;
                     return;
             }
         }

@@ -29,6 +29,8 @@ namespace CardGames
 
         public static Random Rng = new Random();
 
+        public static IntVector2 ConsoleCursorLocation => new IntVector2(Console.CursorLeft, Console.CursorTop);
+
         // returns index of char that user inputed, if not valid then return -1
         public static int GetKeyPress(Char[] validChars)
         {

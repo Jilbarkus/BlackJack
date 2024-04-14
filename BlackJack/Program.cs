@@ -13,6 +13,7 @@
             IGame[] games = new List<IGame>
             {
                 new BlackJack()
+                ,new TestGame()
             }.ToArray();
             // GAMES //
 
