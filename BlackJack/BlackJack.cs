@@ -18,7 +18,7 @@ namespace CardGames
                 case GameState.Betting:
                     currentOutput = new string[] {
                         $"Please place your bets for the next hand, the table minimum is ${bjSettings.minimumBet}",
-                        $"Current Bet: ${bjData.bettingAmmountInput}           Funds: {player.Cash}"
+                        $"Current Bet: ${bjData?.bettingAmmountInput:0}           Funds: {player.Cash}"
                     };
                     bool[] hiLighted = new bool[] { false, false, false, false };
                     string[] buttons = GlobalFunctions.CreateButtonStringArray(new string[] { $"\u2191 Add Bet +{bjSettings.betIncrement}", "\u2192 Start Dealing", "\u2193 Reduce Bet   ", $"x Exit to Menu " }, ref hiLighted, GlobalFunctions.CursorMaxX);
