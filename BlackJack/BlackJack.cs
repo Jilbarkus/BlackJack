@@ -9,6 +9,7 @@ namespace CardGames
         private BJSettings _bjSettings = new BJSettings();
         
         public enum GameState { Betting, Dealing}
+        
         public bool Run(ref PlayerSave player)
         {
             // in case there is no game start one
@@ -100,7 +101,7 @@ namespace CardGames
                     ///
                     currentOutput = new string[0];
                     // dealer value 
-                    currentOutput = currentOutput.Append($"Dealer's hand: {dealerHand}").ToArray();
+                    //currentOutput = currentOutput.Append($"Dealer's hand: {dealerHand}").ToArray();
                     // dealer cards 
                     for (int i = 0; i < _bjData.dealerHand.Length; i++)
                     {
@@ -114,17 +115,20 @@ namespace CardGames
                     // add a spacer so that player's cards are'nt grouped together with dealer's cards
                     //currentOutput = currentOutput.AddStringBlockHorizontal(new string[] { "         " }, GlobalFunctions.CursorMaxX);
                     currentOutput = currentOutput.Append("      ").ToArray();
-                    // player cards 
+                    // player cards A
                     for (int i = 0; i < _bjData.playerHandA.Length; i++)
                     {
                         currentOutput = currentOutput.AddStringBlockHorizontal(_bjData.playerHandA[i].CardToString(), GlobalFunctions.CursorMaxX);
                     }
+                    //spacer between player's two split hands
+                    if (_bjData.playerHandB.Length > 0) currentOutput = currentOutput.AddStringBlockHorizontal(GlobalFunctions.CardSplitSpacer, GlobalFunctions.CursorMaxX);
+                    // player cards B
                     for (int i = 0; i < _bjData.playerHandB.Length; i++)
                     {
                         currentOutput = currentOutput.AddStringBlockHorizontal(_bjData.playerHandB[i].CardToString(), GlobalFunctions.CursorMaxX);
                     }
                     // player value display
-                    currentOutput = currentOutput.Append($"{player.Name}'s hand: {bestPlayerValue}").ToArray();
+                    //currentOutput = currentOutput.Append($"{player.Name}'s hand: {bestPlayerValue}").ToArray();
                     if (bTakeInput)
                     {
                         currentOutput.PrintArrayToConsole(new IntVector2(Console.CursorLeft, Console.CursorTop), JustifyX.Center, JustifyY.Top);
@@ -143,6 +147,8 @@ namespace CardGames
                         decimal playerCashBuffer = player.Cash;
                         if (bEndGame)
                         {
+                            // add a spacer so that winning string block isn't grouped together with dealer's cards
+                            currentOutput = currentOutput.Append("      ").ToArray();
                             //dead heat
                             if ((dealerHand > 21 && bestPlayerValue > 21) || dealerHand == bestPlayerValue)
                             {
@@ -191,15 +197,12 @@ namespace CardGames
 
                         if (bEndGame)
                         {
-                            // player value display
-                            //currentOutput = currentOutput.Append($"{player.Name}'s chips: {player.Cash}").ToArray();
-
                             buttons = EndGameButtonStringBlock();
                             currentOutput = currentOutput.AddStringBlockHorizontal(buttons, GlobalFunctions.CursorMaxX);
-                            // TODO: display player cash or winnings
                             Console.Clear();
-                            currentOutput.PrintArrayToConsole(new IntVector2(Console.CursorLeft, Console.CursorTop), JustifyX.Center, JustifyY.Top);
+                            currentOutput.PrintArrayToConsole(new IntVector2(Console.CursorLeft, Console.CursorTop), JustifyX.Center, JustifyY.Bottom);
                             new string[3] { $"Bank: ${player.Cash}",$"Bet:{_bjData.bettingAmmountInput}",$"Winnings: ${player.Cash - playerCashBuffer - _bjData.bettingAmmountInput}" }.PrintArrayToConsole(new IntVector2(Console.CursorLeft, Console.CursorTop), JustifyX.Right, JustifyY.Top);
+                            new string[2] { $"Dealer's hand: {dealerHand}", $"{player.Name}'s hand: {bestPlayerValue}" }.PrintArrayToConsole(new IntVector2(Console.CursorLeft, Console.CursorTop), JustifyX.Left, JustifyY.Top);
                             switch (GlobalFunctions.GetKeyPress(
                         new ConsoleKeyInfo[] {
                             new ConsoleKeyInfo('x', ConsoleKey.X, false, false, false),
@@ -239,7 +242,9 @@ namespace CardGames
 
 
                     new string[2] { $"Bank: ${player.Cash}", $"Bet: ${_bjData.bettingAmmountInput}" }.PrintArrayToConsole(new IntVector2(Console.CursorLeft, Console.CursorTop), JustifyX.Right, JustifyY.Top);
-
+                    if (_bjData.playerHandB.Length == 0) new string[2] { $"Dealer's hand: {dealerHand}", $"{player.Name}'s hand: {bestPlayerValue}" }.PrintArrayToConsole(new IntVector2(Console.CursorLeft, Console.CursorTop), JustifyX.Left, JustifyY.Top);
+                    else new string[3] { $"Dealer's hand: {dealerHand}", $"{player.Name}'s best split: {bestPlayerValue}", $"Left Split: {playerHandA}, Right Split: {playerHandB}" }.PrintArrayToConsole(new IntVector2(Console.CursorLeft, Console.CursorTop), JustifyX.Left, JustifyY.Top);
+                    
                     //////////// input   ////////////
                     ///
                     if (bTakeInput)

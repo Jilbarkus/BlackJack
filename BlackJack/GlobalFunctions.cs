@@ -675,6 +675,18 @@ $@"|    v   {suitChar}|",
 @"|.........|",
 @"+---------+"
                                 };
+
+        public static string[] CardSplitSpacer => new string[]
+                                {
+@"           ",
+@"           ",
+@"           ",
+@"           ",
+@"   SPLIT   ",
+@"           ",
+@"           ",
+@"           "
+                                };
         public static BJData CheckOrFixDeckLength(this BJData bjData)
         {
             if (bjData.deck.Length <= 1)
