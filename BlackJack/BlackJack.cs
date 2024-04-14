@@ -232,7 +232,7 @@ namespace CardGames
                         currentOutput.PrintArrayToConsole(new IntVector2(Console.CursorLeft, Console.CursorTop), JustifyX.Center, JustifyY.Top);
                         currentOutput = new string[0];
                         
-                        // can we INITIATE a split or double double down
+                        // Case: player can INITIATE a split or double double down
                         if (_bjData.playerHandA.Length == 2 &&
                             _bjData.playerHandB.Length == 0 &&
                             player.Cash >= _bjData.bettingAmmount)
@@ -299,7 +299,11 @@ namespace CardGames
                             }
 
                         }
-                        // TODO: add condition for if we are in the middle of a split
+                        // case player is in the midst of a split
+                        else if (_bjData.playerHandB.Length > 0)
+                        {
+                            // TODO: SPLIT LOGIC
+                        }
                         else
                         {
                             // regular behaviour
