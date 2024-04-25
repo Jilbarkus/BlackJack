@@ -689,8 +689,8 @@ $@"|    v   {suitChar}|",
                                 };
         public static BJData CheckOrFixDeckLength(this BJData bjData)
         {
-            if (bjData.deck.Length <= 1)
-            { bjData.deck = BlackJackDeck(); }
+            if (bjData.Deck.Length <= 1)
+            { bjData.Deck = BlackJackDeck(); }
             return bjData;
         }
 
