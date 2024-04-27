@@ -41,6 +41,11 @@ winnings:
 2X for dealer bust or higher yield than dealer
 
 
+TODO
+
+// - in case of getting a blackjack should probably have the option of hitting
+// - add thread.sleep like delay each time dealer hits card
+
 
 
 
