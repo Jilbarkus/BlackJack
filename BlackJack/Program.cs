@@ -6,6 +6,7 @@
         public static void Main()
         {
             aCard[] deck = GameCards.BJDeck();
+            //string localPath = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
             PlayerSave player = new PlayerSave(500.0m, Environment.UserName.ToString());
             Console.OutputEncoding = System.Text.Encoding.UTF8;
             int currentGame = -1;

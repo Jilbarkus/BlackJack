@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 
 namespace CardGames
 {
+    [System.Serializable]
     public class PlayerSave
     {
         public string Name => name;

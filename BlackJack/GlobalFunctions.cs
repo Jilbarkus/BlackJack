@@ -687,6 +687,28 @@ $@"|    v   {suitChar}|",
 @"           ",
 @"           "
                                 };
+        public static string[] CardSplitSpacerArrowLeft => new string[]
+                                {
+@"           ",
+@"           ",
+@"           ",
+@"           ",
+@"   SPLIT   ",
+@"           ",
+@"   <----   ",
+@"           "
+                                };
+        public static string[] CardSplitSpacerArrowRight => new string[]
+                                {
+@"           ",
+@"           ",
+@"           ",
+@"           ",
+@"   SPLIT   ",
+@"           ",
+@"   ---->   ",
+@"           "
+                                };
         public static BJData CheckOrFixDeckLength(this BJData bjData)
         {
             if (bjData.Deck.Length <= 1)

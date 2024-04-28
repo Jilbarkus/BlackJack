@@ -1,4 +1,5 @@
-﻿using System.Text;
+﻿using System.Diagnostics;
+using System.Text;
 using static CardGames.BlackJack;
 
 namespace CardGames
@@ -143,7 +144,10 @@ namespace CardGames
                         // we want to put a card sized spacer between each split deck (only if there is more than 1 deck and we don't need to put a spacer after the last deck)
                         if (_bjData.PlayerHands.Length > 1 && i < _bjData.PlayerHands.Length - 1)
                         {
-                            currentOutput = currentOutput.AddStringBlockHorizontal(GlobalFunctions.CardSplitSpacer, GlobalFunctions.CursorMaxX);
+                            //currentOutput = currentOutput.AddStringBlockHorizontal(GlobalFunctions.CardSplitSpacer, GlobalFunctions.CursorMaxX);
+
+                            if (i >= playerHandIndex) currentOutput = currentOutput.AddStringBlockHorizontal(GlobalFunctions.CardSplitSpacerArrowLeft, GlobalFunctions.CursorMaxX);
+                            else currentOutput = currentOutput.AddStringBlockHorizontal(GlobalFunctions.CardSplitSpacerArrowRight, GlobalFunctions.CursorMaxX);
                         }
                     }
 
@@ -330,6 +334,8 @@ namespace CardGames
                                     return true;
                             }
                         }
+                        // each time the dealer gets a new card give him a second to 'think'
+                        Thread.Sleep(300);
                     }
 
                     //// print to screen
@@ -389,6 +395,7 @@ namespace CardGames
                                 // Case: player only has one hand and it has stayed, let dealer start
                                 if (_bjData.PlayerHands.Length <= 1)
                                 {
+                                    _bjData.PlayerHands[0].BHeld = true;
                                     _bjData.dealerHand = _bjData.dealerHand.Append(Draw()).ToArray();
                                 }
                                 // Case player has split and can move on to next hand
@@ -550,7 +557,7 @@ namespace CardGames
                 if (Cards == null || 
                     Cards.Length != 2) return false;
 
-                return CardsAreDoubleDownable(Cards[0], Cards[1], handValue);
+                return CardsAreDoubleDownable(Cards[0], Cards[1]/*, handValue*/);
             }
         }
 
@@ -700,35 +707,95 @@ namespace CardGames
             }
         }
 
-        public static bool CardsAreDoubleDownable(aCard cardA, aCard cardB, int handValue = -1)
+        //public static bool CardsAreDoubleDownable(aCard cardA, aCard cardB, int handValue = -1)
+        //{
+        //    if (cardA == null || cardB == null) return false;
+
+        //    if (handValue < 0) handValue = GetBlackJackValue(new aCard[] { cardA, cardB });
+
+        //    bool bAnyAces = false;
+
+        //    if (cardA.GetCardType == aCard.Type.Number)
+        //    {
+        //        NumberCard cardAnum = (NumberCard)cardA;
+        //        if (cardAnum != null && cardAnum.GetNumber == 1) bAnyAces = true;
+        //    }
+
+        //    if (cardB.GetCardType == aCard.Type.Number)
+        //    {
+        //        NumberCard cardBnum = (NumberCard)cardB;
+        //        if (cardBnum != null && cardBnum.GetNumber == 1) bAnyAces = true;
+        //    }
+
+        //    if (bAnyAces == false && 
+        //        9 <= handValue &&
+        //        handValue <= 11) return true;
+            
+        //    if (bAnyAces == true &&
+        //        16 <= handValue &&
+        //        handValue <= 18) return true;
+
+        //    return false;
+        //}
+
+        public static bool CardsAreDoubleDownable(aCard cardA, aCard cardB)
         {
             if (cardA == null || cardB == null) return false;
-
-            if (handValue < 0) handValue = GetBlackJackValue(new aCard[] { cardA, cardB });
-
-            bool bAnyAces = false;
-
+            int handTotal = 0;
+            int aceCount = 0;
+            // card A
             if (cardA.GetCardType == aCard.Type.Number)
             {
-                NumberCard cardAnum = (NumberCard)cardA;
-                if (cardAnum != null && cardAnum.GetNumber == 1) bAnyAces = true;
+                if (HandleNumberCard(cardA) == false) return false;
             }
-
+            else if (cardA.GetCardType == aCard.Type.Face)
+            {
+                if (HandleFaceCard(cardA) == false) return false;
+            }
+            else return false;
+            // card B
             if (cardB.GetCardType == aCard.Type.Number)
             {
-                NumberCard cardBnum = (NumberCard)cardB;
-                if (cardBnum != null && cardBnum.GetNumber == 1) bAnyAces = true;
+                if (HandleNumberCard(cardB) == false) return false;
             }
+            else if (cardB.GetCardType == aCard.Type.Face)
+            {
+                if (HandleFaceCard(cardB) == false) return false;
+            }
+            else return false;
+            // Logic
+            if (aceCount == 0 &&
+                WithinDoubleDownRange(handTotal)) return true;
+            else if (aceCount == 1 &&
+                (WithinDoubleDownRange(handTotal + 1) || WithinDoubleDownRange(handTotal + 11))) return true;
+            else if (aceCount == 2) return false;
+            else return false;
 
-            if (bAnyAces == false && 
-                9 <= handValue &&
-                handValue <= 11) return true;
-            
-            if (bAnyAces == true &&
-                16 <= handValue &&
-                handValue <= 18) return true;
-
-            return false;
+            bool HandleNumberCard(aCard card)
+            {
+                // try cast
+                NumberCard cardNum = (NumberCard)card;
+                if (cardNum == null) { Console.WriteLine("CardsAreDoubleDownable() failing to cast card!"); return false; }
+                // add number card value to total or add ace counter if an ace
+                if (cardNum.GetNumber == 1) aceCount++;
+                else handTotal += cardNum.GetNumber;
+                return true;
+            }
+            bool HandleFaceCard(aCard card)
+            {
+                // try cast
+                FaceCard cardFace = (FaceCard)card;
+                if (cardFace == null) { Console.WriteLine("CardsAreDoubleDownable() failing to cast card!"); return false; }
+                // add 10
+                handTotal += 10;
+                return true;
+            }
+            bool WithinDoubleDownRange(int value)
+            {
+                if (9 <= value &&
+                    value <= 11) return true;
+                return false;
+            }
         }
 
         /// <summary>
