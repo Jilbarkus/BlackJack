@@ -198,7 +198,7 @@ namespace CardGames
                             currentOutput = currentOutput.AddStringBlockHorizontal(buttons, GlobalFunctions.CursorMaxX);
                             //Console.Clear();
                             currentOutput.PrintArrayToConsole(new IntVector2(Console.CursorLeft, Console.CursorTop), JustifyX.Center, JustifyY.Bottom);
-                            new string[3] { $"Bank: ${player.Cash}",$"Bet:{_bjData.BettingAmmount}",$"Winnings: ${player.Cash - playerCashBuffer - _bjData.BettingAmmount}" }.PrintArrayToConsole(new IntVector2(Console.CursorLeft, Console.CursorTop), JustifyX.Right, JustifyY.Top);
+                            new string[3] { $"Bank: ${player.Cash}",$"Bet:-${_bjData.BettingAmmount}",$"Winnings: ${player.Cash - playerCashBuffer /*- _bjData.BettingAmmount*/}" }.PrintArrayToConsole(new IntVector2(Console.CursorLeft, Console.CursorTop), JustifyX.Right, JustifyY.Top);
                             new string[2] { $"Dealer's hand: {dealerHand}", $"{player.Name}'s hand: {bestPlayerValue}" }.PrintArrayToConsole(new IntVector2(Console.CursorLeft, Console.CursorTop), JustifyX.Left, JustifyY.Top);
                             switch (GlobalFunctions.GetKeyPress(
                         new ConsoleKeyInfo[] {
@@ -243,7 +243,7 @@ namespace CardGames
                     // Middle Left Text
                     if (playerValues.Count >= playerHandIndex) new string[1] { $"{player.Name}'s hand: {playerValues[playerHandIndex]}" }.PrintArrayToConsole(new IntVector2(Console.CursorLeft, Console.CursorTop), JustifyX.Left, JustifyY.Center);
                     // Top Right  Text
-                    new string[3] { " ", $"Bank: ${player.Cash}", $"Bet: ${_bjData.BettingAmmount}" }.PrintArrayToConsole(new IntVector2(Console.CursorLeft, Console.CursorTop), JustifyX.Right, JustifyY.Top);
+                    new string[3] { " ", $"Bank: ${player.Cash}", $"Bet: -${_bjData.BettingAmmount}" }.PrintArrayToConsole(new IntVector2(Console.CursorLeft, Console.CursorTop), JustifyX.Right, JustifyY.Top);
 
                     
 
@@ -374,11 +374,6 @@ namespace CardGames
             return output;
         }
 
-        //private bool isGameOver(aCard[] deckIn)
-        //{
-
-        //}
-
         public class BJSettings
         {
             public decimal minimumBet;
@@ -407,20 +402,8 @@ namespace CardGames
             {
                 this.Deck = BlackJackDeck(cardPacks);
                 this.dealerHand = new aCard[0];
-                //this.playerHandA = new aCard[0];
-                //this.playerHandB = new aCard[0];
-                //this.PlayerHands = new List<aCard[]> { new aCard[0] };
                 this.PlayerHands = new BJHand[1] { new BJHand() };
             }
-
-            //public BJData(decimal bettingAmmountInput, aCard[] deck, aCard[] dealerHand, aCard[] playerHandA, aCard[] playerHandB)
-            //{
-            //    this.bettingAmmount = bettingAmmountInput;
-            //    this.deck = deck;
-            //    this.dealerHand = dealerHand;
-            //    this.playerHandA = playerHandA;
-            //    this.playerHandB = playerHandB;
-            //}
         }
 
         public class BJHand
@@ -434,12 +417,6 @@ namespace CardGames
                 if (card == null) { Console.WriteLine("Failed to Deal Card Into Deck, No Card Recieved?"); return; }
                 this.Cards = Cards.Append(card).ToArray();
             }
-
-            //internal bool CanSplit()
-            //{
-            //    if (Cards.Length != 2) return false;
-            //    return CardsAreSplittable(Cards[0], Cards[1]);
-            //}
 
             internal bool CanSplit(out int cardIndexA, out int cardIndexB)
             {

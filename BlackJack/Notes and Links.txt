@@ -47,7 +47,11 @@ TODO
 // - add thread.sleep like delay each time dealer hits card
 // have a display arrow on the split spacer card going towards the active hand
 // bet display at the end of losing/winning a split
+// saving
+// math game
 
+-check betting is working during splits
+-make sure you can double down during a split and that betting is working for that too
 
 
 
