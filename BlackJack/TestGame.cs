@@ -14,7 +14,8 @@ namespace CardGames
 
             //return EmptyDeckValueTest();
             //return BestHandChooserTest();
-            return SplitViabilityTest();
+            //return SplitViabilityTest();
+            return DeckValueTest();
         }
 
         private bool BestHandChooserTest()
@@ -65,6 +66,68 @@ namespace CardGames
             char keyToChar = GetUserKeyToChar();
             if (keyToChar == 'X' || Char.ToUpper(keyToChar) == 'X') return false;
             else return true;
+        }
+
+        private bool DeckValueTest()
+        {
+            Console.Clear();
+            aCard[] hand = new aCard[0];
+            bool bKeepGoing = true;
+            Console.WriteLine("Enter value for number card");
+            Console.WriteLine("Letter for face card");
+            Console.WriteLine("Blank to reset hand");
+            Console.WriteLine("X to Quit");
+            while (bKeepGoing)
+            {
+                Console.WriteLine($"hand value: {BlackJack.GetBlackJackValue(hand)}");
+                string? usrInput = Console.ReadLine();
+                if (usrInput == null || (usrInput != null && (usrInput == "x" || usrInput == "X"))) { return false; }
+                else if (usrInput != null &&
+                    int.TryParse(usrInput, out int numCardValue) &&
+                    0 < numCardValue &&
+                    numCardValue < 11)
+                {
+                    NumberCard numberCard = new NumberCard(aCard.Suit.Heart, numCardValue);
+                    if (numberCard != null)
+                    {
+                        hand = hand.Append(numberCard).ToArray();
+                    }
+                }
+                else if (usrInput != null && 
+                    (usrInput == "K" || usrInput == "k"))
+                {
+                    FaceCard faceCard = new FaceCard(aCard.Suit.Heart, FaceCard.Face.King);
+                    if (faceCard != null)
+                    {
+                        hand = hand.Append(faceCard).ToArray();
+                    }
+                }
+                else if (usrInput != null &&
+                    (usrInput == "Q" || usrInput == "q"))
+                {
+                    FaceCard faceCard = new FaceCard(aCard.Suit.Heart, FaceCard.Face.Queen);
+                    if (faceCard != null)
+                    {
+                        hand = hand.Append(faceCard).ToArray();
+                    }
+                }
+                else if (usrInput != null &&
+                    (usrInput == "J" || usrInput == "j"))
+                {
+                    FaceCard faceCard = new FaceCard(aCard.Suit.Heart, FaceCard.Face.Jack);
+                    if (faceCard != null)
+                    {
+                        hand = hand.Append(faceCard).ToArray();
+                    }
+                }
+                else if (usrInput != null &&
+                    (usrInput == "" || usrInput == " "))
+                {
+                    hand = new aCard[0];
+                }
+            }
+
+            return false;
         }
 
         private char GetUserKeyToChar()
