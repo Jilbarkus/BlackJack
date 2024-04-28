@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Text.Json;
 using System.Threading.Tasks;
 
 namespace CardGames
@@ -15,7 +16,8 @@ namespace CardGames
             //return EmptyDeckValueTest();
             //return BestHandChooserTest();
             //return SplitViabilityTest();
-            return DeckValueTest();
+            //return DeckValueTest();
+            return SaveLoadTest();
         }
 
         private bool BestHandChooserTest()
@@ -145,5 +147,119 @@ namespace CardGames
             }
             return keyToChar;
         }
+
+        private bool SaveLoadTest()
+        {
+            Console.Clear();
+            Console.WriteLine("D to display file path");
+            Console.WriteLine("S to save");
+            Console.WriteLine("L to load");
+            Console.WriteLine("X to quit");
+            
+            while (true)
+            {
+                char usrInput = GetUserKeyToChar();
+                if (usrInput == 'x' || usrInput == 'X') return false;
+                if (usrInput == 'd' || usrInput == 'D') DisplayPath();
+                if (usrInput == 's' || usrInput == 'S') Save();
+                if (usrInput == 'l' || usrInput == 'L') Load();
+            }
+            return false;
+        }
+
+        private void DisplayPath()
+        {
+            Console.WriteLine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData));
+        }
+
+        private void Save()
+        {
+            //PlayerSave player = new PlayerSave(69.0m, "test player");
+            Random random = new Random();
+            PlayerSave player = new PlayerSave("test player", (decimal)random.Next(0, 5000));
+            
+            string jsonTxt = JsonSerializer.Serialize<PlayerSave>(player);
+            byte[] jsonBytes = Encoding.ASCII.GetBytes(jsonTxt);
+            string path = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData) + "\\bjData.bjd";
+
+            try
+            {
+                File.WriteAllText(path, jsonTxt);
+                Console.WriteLine($"saved player: {player.Name}, cash: ${player.Cash}");
+                //using (FileStream fs = File.Create(path))
+                //{
+                //    fs.Write(jsonBytes, 0, jsonBytes.Length);
+                //    Console.WriteLine($"saved player: {player.Name}, cash: ${player.Cash}");
+                //}
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.ToString());
+            }
+            
+            
+        }
+
+        private void Load()
+        {
+            string path = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData) + "\\bjData.bjd";
+            if (File.Exists(path) == false) return;
+
+            try
+            {
+                //using (StreamReader sr = new StreamReader(path))
+                //{
+                //    string jsonTxt = sr.ReadToEnd();
+                //    if (jsonTxt != null && jsonTxt.Length > 0)
+                //    {
+                //        PlayerSave? outputDemo = (PlayerSave?)JsonSerializer.Deserialize<PlayerSave>(jsonTxt);
+                //        if (outputDemo == null) { Console.WriteLine("FAIL!"); return; }
+                //        Console.WriteLine($"Loaded player: {outputDemo.Name}, cash: ${outputDemo.Cash}");
+
+                //        //string jSonTxt = JsonSerializer.Deserialize<string>(jsonTxt);
+                //        //if (outputDemo == null) { Console.WriteLine("FAIL!"); return; }
+                //        //Console.WriteLine($"Loaded player: {outputDemo.Name}, cash: ${outputDemo.Cash}");
+                //    }
+                //}
+
+                string jsonString = File.ReadAllText(path);
+                PlayerSave? player = JsonSerializer.Deserialize<PlayerSave>(jsonString);
+                if (player == null) { Console.WriteLine("FAIL!"); return; }
+                Console.WriteLine($"Loaded player: {player.Name}, cash: ${player.Cash}");
+            }
+            catch(Exception ex)
+            {
+                Console.WriteLine(ex.ToString());
+            }
+
+            
+        }
+
+        //private void Save()
+        //{
+        //    using (var memoryStream = new System.IO.MemoryStream())
+        //    {
+        //        var formatter = new System.Runtime.Serialization.Formatters.Binary.BinaryFormatter();
+        //        PlayerSave player = new PlayerSave(69.0m, "test player");
+        //        formatter.Serialize(memoryStream, player);
+
+        //        // This resets the memory stream position for the following read operation
+        //        memoryStream.Seek(0, SeekOrigin.Begin);
+
+        //        // Get the bytes
+        //        var bytes = new byte[memoryStream.Length];
+        //        memoryStream.Read(bytes, 0, (int)memoryStream.Length);
+
+        //        // TODO: encrypt data here
+        //        // - also haven't yet added a Load() method
+
+        //        using (FileStream fs = File.Create(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData) + "\\bjData.bjd"))
+        //        {
+        //            fs.Write(bytes, 0, bytes.Length);
+        //        }
+        //    }
+        //}
+
+
     }
 }

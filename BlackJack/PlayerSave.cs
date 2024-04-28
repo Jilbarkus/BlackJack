@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 
 namespace CardGames
@@ -9,18 +10,33 @@ namespace CardGames
     [System.Serializable]
     public class PlayerSave
     {
-        public string Name => name;
-        public decimal Cash => cash;
-        public void AddCash(decimal deltaCash) => cash = cash += deltaCash;
+        public string Name => _name;
+        public decimal Cash => _cash;
+        public void AddCash(decimal deltaCash) => _cash = _cash += deltaCash;
 
-        protected decimal cash = 0.0M;
-        protected string name = "PlayerName";
+        protected decimal _cash = 0.0M;
+        protected string _name = "PlayerName";
 
-        public PlayerSave(decimal cash, string nameIn)
+        [JsonConstructor]
+        public PlayerSave(string _name, decimal _cash)
         {
-            this.cash = cash;
-            name = nameIn ?? throw new ArgumentNullException(nameof(nameIn));
-            if (nameIn.Split('.', ' ').Length > 1) name = nameIn.Split('.', ' ')[0];
+            this._cash = _cash;
+            this._name = _name ?? throw new ArgumentNullException(nameof(_name));
+            if (_name.Split('.', ' ').Length > 1) this._name = _name.Split('.', ' ')[0];
         }
+
+
+        //public string Name = "playerNmae";
+        //public decimal Cash = 0.0M;
+
+        //public void AddCash(decimal deltaCash) => Cash = Cash += deltaCash;
+
+        //[JsonConstructor]
+        //public PlayerSave(string _name, decimal _cash)
+        //{
+        //    this.Cash = _cash;
+        //    this.Name = _name ?? throw new ArgumentNullException(nameof(_name));
+        //    if (_name.Split('.', ' ').Length > 1) this.Name = _name.Split('.', ' ')[0];
+        //}
     }
 }
