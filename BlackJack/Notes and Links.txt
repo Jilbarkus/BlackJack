@@ -42,7 +42,6 @@ winnings:
 
 
 TODO
-// saving
 // math game
 // bug with split logic, if you have more than two cards in the deck you are splitting. it will only take first 2
 

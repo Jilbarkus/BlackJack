@@ -3,6 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Text.Json;
+using System.Xml;
+using System.Xml.Serialization;
+using System.IO;
 using System.Threading.Tasks;
 
 namespace CardGames
@@ -17,7 +20,7 @@ namespace CardGames
             //return BestHandChooserTest();
             //return SplitViabilityTest();
             //return DeckValueTest();
-            return SaveLoadTest();
+            return SaveLoadTest(player);
         }
 
         private bool BestHandChooserTest()
@@ -148,7 +151,7 @@ namespace CardGames
             return keyToChar;
         }
 
-        private bool SaveLoadTest()
+        private bool SaveLoadTest(PlayerSave player)
         {
             Console.Clear();
             Console.WriteLine("D to display file path");
@@ -161,8 +164,12 @@ namespace CardGames
                 char usrInput = GetUserKeyToChar();
                 if (usrInput == 'x' || usrInput == 'X') return false;
                 if (usrInput == 'd' || usrInput == 'D') DisplayPath();
-                if (usrInput == 's' || usrInput == 'S') Save();
-                if (usrInput == 'l' || usrInput == 'L') Load();
+                //if (usrInput == 's' || usrInput == 'S') Save2();
+                //if (usrInput == 'l' || usrInput == 'L') Load2();
+                //if (usrInput == 's' || usrInput == 'S') Save3();
+                //if (usrInput == 'l' || usrInput == 'L') Load3();
+                if (usrInput == 's' || usrInput == 'S') Save4(player);
+                if (usrInput == 'l' || usrInput == 'L') Load4(ref player);
             }
             return false;
         }
@@ -172,67 +179,165 @@ namespace CardGames
             Console.WriteLine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData));
         }
 
-        private void Save()
-        {
-            //PlayerSave player = new PlayerSave(69.0m, "test player");
-            Random random = new Random();
-            PlayerSave player = new PlayerSave("test player", (decimal)random.Next(0, 5000));
+        //private void Save()
+        //{
+        //    //PlayerSave player = new PlayerSave(69.0m, "test player");
+        //    Random random = new Random();
+        //    PlayerSave player = new PlayerSave("test player", (decimal)random.Next(0, 5000));
             
-            string jsonTxt = JsonSerializer.Serialize<PlayerSave>(player);
-            byte[] jsonBytes = Encoding.ASCII.GetBytes(jsonTxt);
-            string path = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData) + "\\bjData.bjd";
+        //    string jsonTxt = JsonSerializer.Serialize<PlayerSave>(player);
+        //    byte[] jsonBytes = Encoding.ASCII.GetBytes(jsonTxt);
+        //    string path = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData) + "\\bjData.bjd";
 
-            try
-            {
-                File.WriteAllText(path, jsonTxt);
-                Console.WriteLine($"saved player: {player.Name}, cash: ${player.Cash}");
-                //using (FileStream fs = File.Create(path))
-                //{
-                //    fs.Write(jsonBytes, 0, jsonBytes.Length);
-                //    Console.WriteLine($"saved player: {player.Name}, cash: ${player.Cash}");
-                //}
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine(ex.ToString());
-            }
+        //    try
+        //    {
+        //        File.WriteAllText(path, jsonTxt);
+        //        Console.WriteLine($"saved player: {player.Name}, cash: ${player.Cash}");
+        //        //using (FileStream fs = File.Create(path))
+        //        //{
+        //        //    fs.Write(jsonBytes, 0, jsonBytes.Length);
+        //        //    Console.WriteLine($"saved player: {player.Name}, cash: ${player.Cash}");
+        //        //}
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        Console.WriteLine(ex.ToString());
+        //    }
             
             
+        //}
+
+        //private void Load()
+        //{
+        //    string path = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData) + "\\bjData.bjd";
+        //    if (File.Exists(path) == false) return;
+
+        //    try
+        //    {
+        //        //using (StreamReader sr = new StreamReader(path))
+        //        //{
+        //        //    string jsonTxt = sr.ReadToEnd();
+        //        //    if (jsonTxt != null && jsonTxt.Length > 0)
+        //        //    {
+        //        //        PlayerSave? outputDemo = (PlayerSave?)JsonSerializer.Deserialize<PlayerSave>(jsonTxt);
+        //        //        if (outputDemo == null) { Console.WriteLine("FAIL!"); return; }
+        //        //        Console.WriteLine($"Loaded player: {outputDemo.Name}, cash: ${outputDemo.Cash}");
+
+        //        //        //string jSonTxt = JsonSerializer.Deserialize<string>(jsonTxt);
+        //        //        //if (outputDemo == null) { Console.WriteLine("FAIL!"); return; }
+        //        //        //Console.WriteLine($"Loaded player: {outputDemo.Name}, cash: ${outputDemo.Cash}");
+        //        //    }
+        //        //}
+
+        //        string jsonString = File.ReadAllText(path);
+        //        PlayerSave? player = JsonSerializer.Deserialize<PlayerSave>(jsonString);
+        //        if (player == null) { Console.WriteLine("FAIL!"); return; }
+        //        Console.WriteLine($"Loaded player: {player.Name}, cash: ${player.Cash}");
+        //    }
+        //    catch(Exception ex)
+        //    {
+        //        Console.WriteLine(ex.ToString());
+        //    }
+
+            
+        //}
+
+        
+
+        private string GetSavePath => Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData) + "\\bjData.xml";
+
+        private void Save2()
+        {
+            XmlSerializer serialiser = new XmlSerializer(typeof(TestSaveFile1));
+            TextWriter writer = new StreamWriter(GetSavePath);
+            TestSaveFile1 saveFile1 = new TestSaveFile1();
+            Random random = new Random();
+            saveFile1.testValue = (decimal)random.Next(0, 10000);
+            serialiser.Serialize(writer, saveFile1);
+            writer.Close();
         }
 
-        private void Load()
+        private void Load2()
         {
-            string path = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData) + "\\bjData.bjd";
+            string path = GetSavePath;
             if (File.Exists(path) == false) return;
+            XmlSerializer serialiser = new XmlSerializer(typeof(TestSaveFile1));
+            serialiser.UnknownNode += new XmlNodeEventHandler(serializer_UnknownNode);
+            serialiser.UnknownAttribute += new XmlAttributeEventHandler(serializer_UnknownAttribute);
+            FileStream fs = new FileStream(path, FileMode.Open);
+            TestSaveFile1 saveFile;
+            saveFile = (TestSaveFile1)serialiser.Deserialize(fs);
+            Console.WriteLine($"Loaded save: {saveFile.FileName}, value: {saveFile.testValue}");
+        }
 
-            try
-            {
-                //using (StreamReader sr = new StreamReader(path))
-                //{
-                //    string jsonTxt = sr.ReadToEnd();
-                //    if (jsonTxt != null && jsonTxt.Length > 0)
-                //    {
-                //        PlayerSave? outputDemo = (PlayerSave?)JsonSerializer.Deserialize<PlayerSave>(jsonTxt);
-                //        if (outputDemo == null) { Console.WriteLine("FAIL!"); return; }
-                //        Console.WriteLine($"Loaded player: {outputDemo.Name}, cash: ${outputDemo.Cash}");
+        private void Save3()
+        {
+            XmlSerializer serialiser = new XmlSerializer(typeof(PlayerSave));
+            TextWriter writer = new StreamWriter(GetSavePath);
+            Random random = new Random();
+            PlayerSave saveFile1 = new PlayerSave("some guy", (decimal)random.Next(0, 10000));
+            saveFile1.AddCashAndSave((decimal)random.Next(0, 10000));
+            Console.WriteLine($"created save: {saveFile1.Name}, value: {saveFile1.Cash}");
+            serialiser.Serialize(writer, saveFile1);
+            writer.Close();
+        }
 
-                //        //string jSonTxt = JsonSerializer.Deserialize<string>(jsonTxt);
-                //        //if (outputDemo == null) { Console.WriteLine("FAIL!"); return; }
-                //        //Console.WriteLine($"Loaded player: {outputDemo.Name}, cash: ${outputDemo.Cash}");
-                //    }
-                //}
+        private void Load3()
+        {
+            string path = GetSavePath;
+            if (File.Exists(path) == false) return;
+            XmlSerializer serialiser = new XmlSerializer(typeof(PlayerSave));
+            serialiser.UnknownNode += new XmlNodeEventHandler(serializer_UnknownNode);
+            serialiser.UnknownAttribute += new XmlAttributeEventHandler(serializer_UnknownAttribute);
+            FileStream fs = new FileStream(path, FileMode.Open);
+            PlayerSave saveFile;
+            saveFile = (PlayerSave)serialiser.Deserialize(fs);
+            Console.WriteLine($"Loaded save: {saveFile.Name}, value: {saveFile.Cash}");
+        }
 
-                string jsonString = File.ReadAllText(path);
-                PlayerSave? player = JsonSerializer.Deserialize<PlayerSave>(jsonString);
-                if (player == null) { Console.WriteLine("FAIL!"); return; }
-                Console.WriteLine($"Loaded player: {player.Name}, cash: ${player.Cash}");
-            }
-            catch(Exception ex)
-            {
-                Console.WriteLine(ex.ToString());
-            }
+        private void Save4(PlayerSave player)
+        {
+            //XmlSerializer serialiser = new XmlSerializer(typeof(PlayerSave));
+            //TextWriter writer = new StreamWriter(GetSavePath);    // this fail
+            //serialiser.Serialize(writer, player);
+            //writer.Close();
+            player.Save();
+        }
 
+        private void Load4(ref PlayerSave player)
+        {
+            //string path = GetSavePath;
+            //if (File.Exists(path) == false) return;
+            //XmlSerializer serialiser = new XmlSerializer(typeof(PlayerSave));
+            //serialiser.UnknownNode += new XmlNodeEventHandler(serializer_UnknownNode);
+            //serialiser.UnknownAttribute += new XmlAttributeEventHandler(serializer_UnknownAttribute);
+            //FileStream fs = new FileStream(path, FileMode.Open);
+            //PlayerSave? saveFile;
+            //saveFile = (PlayerSave?)serialiser.Deserialize(fs);
+            //if (saveFile != null) player = saveFile;
+
+            PlayerSave? saveFile = PlayerSave.Load();
             
+            if (saveFile != null)
+            {
+                //player = saveFile;
+                player = new PlayerSave(saveFile.Name, saveFile.Cash);
+                Console.WriteLine($"Loaded save: {saveFile.Name}, value: {saveFile.Cash}");
+            }
+        }
+
+        private void serializer_UnknownNode
+   (object sender, XmlNodeEventArgs e)
+        {
+            Console.WriteLine("Unknown Node:" + e.Name + "\t" + e.Text);
+        }
+
+        private void serializer_UnknownAttribute
+        (object sender, XmlAttributeEventArgs e)
+        {
+            System.Xml.XmlAttribute attr = e.Attr;
+            Console.WriteLine("Unknown attribute " +
+            attr.Name + "='" + attr.Value + "'");
         }
 
         //private void Save()
@@ -261,5 +366,12 @@ namespace CardGames
         //}
 
 
+    }
+
+    [XmlRootAttribute("TestSaveFile1", Namespace = "Casino", IsNullable = false)]
+    public class TestSaveFile1
+    {
+        public string FileName = "testFile";
+        public decimal testValue = decimal.Zero;
     }
 }

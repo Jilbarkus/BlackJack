@@ -39,7 +39,7 @@ namespace CardGames
                             if (player.Cash >= _bjSettings.betIncrement)
                             {
                                 _bjData.PlayerHands[0].Bet += _bjSettings.betIncrement;
-                                player.AddCash(-_bjSettings.betIncrement);
+                                player.AddCashAndSave(-_bjSettings.betIncrement);
 
                             }
                             break;
@@ -57,7 +57,7 @@ namespace CardGames
                             if (_bjData.PlayerHands[0].Bet - _bjSettings.betIncrement >= 0m)
                             {
                                 _bjData.PlayerHands[0].Bet -= _bjSettings.betIncrement;
-                                player.AddCash(_bjSettings.betIncrement);
+                                player.AddCashAndSave(_bjSettings.betIncrement);
                             }
                             break;
                         default: break;
@@ -264,7 +264,7 @@ namespace CardGames
                                 if (dealerHand > 21 && playerValues[i] > 21
                                     || dealerHand == playerValues[i])
                                 {
-                                    player.AddCash(_bjData.PlayerHands[i].Bet);
+                                    player.AddCashAndSave(_bjData.PlayerHands[i].Bet);
                                 }
                                 // blackjack
                                 else if (playerValues[i] == 21)
@@ -272,18 +272,18 @@ namespace CardGames
                                     // Case: blackjack without hitting
                                     if (_bjData.PlayerHands[i].Cards.Length == 2)
                                     {
-                                        player.AddCash(_bjData.PlayerHands[i].Bet * 1.5m);
+                                        player.AddCashAndSave(_bjData.PlayerHands[i].Bet * 1.5m);
                                     }
                                     // Case: blackjack after hitting at least one card
                                     else
                                     {
-                                        player.AddCash(_bjData.PlayerHands[i].Bet * 2m);
+                                        player.AddCashAndSave(_bjData.PlayerHands[i].Bet * 2m);
                                     }
                                 }
                                 // dealer bust
                                 else if (dealerHand > 21)
                                 {
-                                    player.AddCash(_bjData.PlayerHands[i].Bet * 2m);
+                                    player.AddCashAndSave(_bjData.PlayerHands[i].Bet * 2m);
                                 }
                                 // player bust
                                 else if (playerValues[i] > 21)
@@ -293,7 +293,7 @@ namespace CardGames
                                 // player winning hand
                                 else if (playerValues[i] > dealerHand)
                                 {
-                                    player.AddCash(_bjData.PlayerHands[i].Bet * 2m);
+                                    player.AddCashAndSave(_bjData.PlayerHands[i].Bet * 2m);
                                 }
                                 // dealer winning hand
                                 else
@@ -328,12 +328,13 @@ namespace CardGames
                                 default:
                                     resetBJGame();
                                     if (player.Cash < _bjSettings.mostRecentBet) return false;
-                                    player.AddCash(-_bjSettings.mostRecentBet);
+                                    player.AddCashAndSave(-_bjSettings.mostRecentBet);
                                     _bjData.PlayerHands[0].Bet = _bjSettings.mostRecentBet;
                                     changeState(GameState.Dealing);
                                     return true;
                             }
                         }
+                        new string[1] { "Dealing..." }.PrintArrayToConsole(new IntVector2(Console.CursorLeft, Console.CursorTop), JustifyX.Center, JustifyY.Center);
                         // each time the dealer gets a new card give him a second to 'think'
                         Thread.Sleep(300);
                     }
@@ -412,7 +413,7 @@ namespace CardGames
                                 // check valid
                                 if (!bSplittable2) return true;
                                 // bet part A
-                                player.AddCash(-_bjData.PlayerHands[playerHandIndex].Bet);
+                                player.AddCashAndSave(-_bjData.PlayerHands[playerHandIndex].Bet);
                                 // new hand
                                 BJHand freshSplit = new BJHand();
                                 // put the second card from the hand to be split into the new hand
@@ -426,7 +427,7 @@ namespace CardGames
                                 return true;
                             case 4:
                                 if (!bDoubleDownable2) return true;
-                                player.AddCash(-_bjData.PlayerHands[playerHandIndex].Bet);
+                                player.AddCashAndSave(-_bjData.PlayerHands[playerHandIndex].Bet);
                                 _bjData.PlayerHands[playerHandIndex].Bet *= 2;
                                 _bjData.PlayerHands[playerHandIndex].DealCardIntoHand(ref _bjData.Deck);
                                 //_bjData.dealerHand = _bjData.dealerHand.Append(Draw()).ToArray();
