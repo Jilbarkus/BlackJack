@@ -6,10 +6,6 @@
         public static void Main()
         {
             aCard[] deck = GameCards.BJDeck();
-            //string localPath = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
-            //PlayerSave player = new PlayerSave();
-            //player.Name = PlayerSave.VerifyName(Environment.UserName.ToString());
-            //player.AddCash(500.0m);
             PlayerSave? playerLoad = PlayerSave.Load();
             PlayerSave player = (playerLoad != null)? playerLoad : new PlayerSave(Environment.UserName.ToString(), 100.0m);
             Console.OutputEncoding = System.Text.Encoding.UTF8;
@@ -18,7 +14,8 @@
             IGame[] games = new List<IGame>
             {
                 new BlackJack()
-                ,new TestGame()
+                //,new TestGame()
+                ,new DoMath()
             }.ToArray();
             // GAMES //
 

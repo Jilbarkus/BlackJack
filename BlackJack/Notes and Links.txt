@@ -42,8 +42,7 @@ winnings:
 
 
 TODO
-// math game
-// bug with split logic, if you have more than two cards in the deck you are splitting. it will only take first 2
+// math game - ad the ascii art with the teacher and the ruler, add quotes like "If Man Works Hard the Land Will Not Be Lazy"
 
 
 

@@ -412,16 +412,23 @@ namespace CardGames
                             case 3:
                                 // check valid
                                 if (!bSplittable2) return true;
-                                // bet part A
-                                player.AddCashAndSave(-_bjData.PlayerHands[playerHandIndex].Bet);
                                 // new hand
                                 BJHand freshSplit = new BJHand();
-                                // put the second card from the hand to be split into the new hand
-                                freshSplit.Cards = new aCard[] { _bjData.PlayerHands[playerHandIndex].Cards[splitIndexB] };
-                                // bet part B
+                                // betting
+                                player.AddCashAndSave(-_bjData.PlayerHands[playerHandIndex].Bet);
                                 freshSplit.Bet = _bjData.PlayerHands[playerHandIndex].Bet;
-                                // remove the second card from the first hand
-                                _bjData.PlayerHands[playerHandIndex].Cards = new aCard[] { _bjData.PlayerHands[playerHandIndex].Cards[splitIndexA] };
+                                // splitting cards
+                                List<aCard> playerHandCards = new List<aCard>();
+                                List<aCard> freshSplitCards = new List<aCard>();
+                                for (int i = 0; i < _bjData.PlayerHands[playerHandIndex].Cards.Length; i++)
+                                {
+                                    // put the second card from the hand to be split into the new hand
+                                    if (i == splitIndexB) freshSplitCards.Add(_bjData.PlayerHands[playerHandIndex].Cards[i]);
+                                    // all others to main hand
+                                    else playerHandCards.Add(_bjData.PlayerHands[playerHandIndex].Cards[i]);
+                                }
+                                _bjData.PlayerHands[playerHandIndex].Cards = playerHandCards.ToArray();
+                                freshSplit.Cards = freshSplitCards.ToArray();
                                 // add the new hand into the data
                                 _bjData.PlayerHands = _bjData.PlayerHands.Append(freshSplit).ToArray();
                                 return true;

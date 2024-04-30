@@ -179,69 +179,6 @@ namespace CardGames
             Console.WriteLine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData));
         }
 
-        //private void Save()
-        //{
-        //    //PlayerSave player = new PlayerSave(69.0m, "test player");
-        //    Random random = new Random();
-        //    PlayerSave player = new PlayerSave("test player", (decimal)random.Next(0, 5000));
-            
-        //    string jsonTxt = JsonSerializer.Serialize<PlayerSave>(player);
-        //    byte[] jsonBytes = Encoding.ASCII.GetBytes(jsonTxt);
-        //    string path = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData) + "\\bjData.bjd";
-
-        //    try
-        //    {
-        //        File.WriteAllText(path, jsonTxt);
-        //        Console.WriteLine($"saved player: {player.Name}, cash: ${player.Cash}");
-        //        //using (FileStream fs = File.Create(path))
-        //        //{
-        //        //    fs.Write(jsonBytes, 0, jsonBytes.Length);
-        //        //    Console.WriteLine($"saved player: {player.Name}, cash: ${player.Cash}");
-        //        //}
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        Console.WriteLine(ex.ToString());
-        //    }
-            
-            
-        //}
-
-        //private void Load()
-        //{
-        //    string path = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData) + "\\bjData.bjd";
-        //    if (File.Exists(path) == false) return;
-
-        //    try
-        //    {
-        //        //using (StreamReader sr = new StreamReader(path))
-        //        //{
-        //        //    string jsonTxt = sr.ReadToEnd();
-        //        //    if (jsonTxt != null && jsonTxt.Length > 0)
-        //        //    {
-        //        //        PlayerSave? outputDemo = (PlayerSave?)JsonSerializer.Deserialize<PlayerSave>(jsonTxt);
-        //        //        if (outputDemo == null) { Console.WriteLine("FAIL!"); return; }
-        //        //        Console.WriteLine($"Loaded player: {outputDemo.Name}, cash: ${outputDemo.Cash}");
-
-        //        //        //string jSonTxt = JsonSerializer.Deserialize<string>(jsonTxt);
-        //        //        //if (outputDemo == null) { Console.WriteLine("FAIL!"); return; }
-        //        //        //Console.WriteLine($"Loaded player: {outputDemo.Name}, cash: ${outputDemo.Cash}");
-        //        //    }
-        //        //}
-
-        //        string jsonString = File.ReadAllText(path);
-        //        PlayerSave? player = JsonSerializer.Deserialize<PlayerSave>(jsonString);
-        //        if (player == null) { Console.WriteLine("FAIL!"); return; }
-        //        Console.WriteLine($"Loaded player: {player.Name}, cash: ${player.Cash}");
-        //    }
-        //    catch(Exception ex)
-        //    {
-        //        Console.WriteLine(ex.ToString());
-        //    }
-
-            
-        //}
-
         
 
         private string GetSavePath => Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData) + "\\bjData.xml";
@@ -297,24 +234,11 @@ namespace CardGames
 
         private void Save4(PlayerSave player)
         {
-            //XmlSerializer serialiser = new XmlSerializer(typeof(PlayerSave));
-            //TextWriter writer = new StreamWriter(GetSavePath);    // this fail
-            //serialiser.Serialize(writer, player);
-            //writer.Close();
             player.Save();
         }
 
         private void Load4(ref PlayerSave player)
         {
-            //string path = GetSavePath;
-            //if (File.Exists(path) == false) return;
-            //XmlSerializer serialiser = new XmlSerializer(typeof(PlayerSave));
-            //serialiser.UnknownNode += new XmlNodeEventHandler(serializer_UnknownNode);
-            //serialiser.UnknownAttribute += new XmlAttributeEventHandler(serializer_UnknownAttribute);
-            //FileStream fs = new FileStream(path, FileMode.Open);
-            //PlayerSave? saveFile;
-            //saveFile = (PlayerSave?)serialiser.Deserialize(fs);
-            //if (saveFile != null) player = saveFile;
 
             PlayerSave? saveFile = PlayerSave.Load();
             
@@ -339,31 +263,6 @@ namespace CardGames
             Console.WriteLine("Unknown attribute " +
             attr.Name + "='" + attr.Value + "'");
         }
-
-        //private void Save()
-        //{
-        //    using (var memoryStream = new System.IO.MemoryStream())
-        //    {
-        //        var formatter = new System.Runtime.Serialization.Formatters.Binary.BinaryFormatter();
-        //        PlayerSave player = new PlayerSave(69.0m, "test player");
-        //        formatter.Serialize(memoryStream, player);
-
-        //        // This resets the memory stream position for the following read operation
-        //        memoryStream.Seek(0, SeekOrigin.Begin);
-
-        //        // Get the bytes
-        //        var bytes = new byte[memoryStream.Length];
-        //        memoryStream.Read(bytes, 0, (int)memoryStream.Length);
-
-        //        // TODO: encrypt data here
-        //        // - also haven't yet added a Load() method
-
-        //        using (FileStream fs = File.Create(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData) + "\\bjData.bjd"))
-        //        {
-        //            fs.Write(bytes, 0, bytes.Length);
-        //        }
-        //    }
-        //}
 
 
     }
