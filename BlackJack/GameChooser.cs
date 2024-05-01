@@ -1,12 +1,17 @@
-﻿using System.Reflection;
+﻿using System.Numerics;
+using System.Reflection;
 
 namespace CardGames
 {
     static class GameChooser
     {
-        public static bool Choose(IGame[] games, ref int index, in PlayerSave playerSave)
+        public static bool Choose(IGame[] games, ref int index, in PlayerSave playerSave, bool bPlayWelcomeMessage = false)
         {
             Console.Clear();
+            if (bPlayWelcomeMessage == true)
+            {
+                new string[] { $"New guest {playerSave.Name}!", "Here is $100 to get you started" }.PrintArrayToConsole(new IntVector2(Console.CursorLeft, Console.CursorTop), JustifyX.Center, JustifyY.Center);
+            }
             getLogoArray().PrintArrayToConsole(new IntVector2(Console.CursorLeft, Console.CursorTop), JustifyX.Center, JustifyY.Top);
             string[] text = new string[] { "", $"         Welcome {playerSave.Name}, What would you like to do?", "" };
             for (int i = 0; i < games.Length; i++)
@@ -14,8 +19,12 @@ namespace CardGames
                 text = text.Append($"{i + 1}) {games[i].GetType().Name}").ToArray();
                 text = text.Append("").ToArray();
             }
+            text = text.Append($"X) Quit").ToArray();
+            text = text.Append("").ToArray();
             text.PrintArrayToConsole(new IntVector2(Console.CursorLeft, Console.CursorTop), JustifyX.Center, JustifyY.Bottom);
-            //// ^^ NEW ^^
+            // Top Right  Text
+            new string[1] { $"Bank: ${playerSave.Cash}" }.PrintArrayToConsole(new IntVector2(Console.CursorLeft, Console.CursorTop), JustifyX.Right, JustifyY.Top);
+
             char userInput = Console.ReadKey().KeyChar;
             Console.Clear();
             switch (userInput)

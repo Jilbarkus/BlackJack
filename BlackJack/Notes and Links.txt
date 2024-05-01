@@ -43,6 +43,8 @@ winnings:
 
 TODO
 // math game - ad the ascii art with the teacher and the ruler, add quotes like "If Man Works Hard the Land Will Not Be Lazy"
+// welcome splash screen for new players (no save file found)
+// show bank at start screen
 
 
 

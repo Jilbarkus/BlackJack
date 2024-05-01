@@ -22,6 +22,12 @@ namespace CardGames
             switch (_state)
             {
                 case GameState.Betting:
+                    if (player.Cash < _bjSettings.minimumBet || player.Cash < _bjSettings.betIncrement)
+                    {
+                        new string[] {"Sorry, no deadbeats allowed.", "Press any key to go back to the main menu." }.PrintArrayToConsole(new IntVector2(Console.CursorLeft, Console.CursorTop), JustifyX.Center, JustifyY.Center);
+                        Console.ReadKey();
+                        return false;
+                    }
                     currentOutput = new string[] {
                         $"Please place your bets for the next hand, the table minimum is ${_bjSettings.minimumBet}",
                         $"Current Bet: ${_bjData.PlayerHands[0].Bet}           Funds: {player.Cash}"
@@ -36,20 +42,21 @@ namespace CardGames
                     {
                         case 0: return false;
                         case 1:
-                            if (player.Cash >= _bjSettings.betIncrement)
+                            if (player.Cash >= _bjData.PlayerHands[0].Bet + _bjSettings.betIncrement)
                             {
                                 _bjData.PlayerHands[0].Bet += _bjSettings.betIncrement;
-                                player.AddCashAndSave(-_bjSettings.betIncrement);
+                                //player.AddCashAndSave(-_bjSettings.betIncrement);
 
                             }
                             break;
                         case 2:
-                            if (_bjData.PlayerHands[0].Bet >= _bjSettings.minimumBet)
+                            if (_bjData.PlayerHands[0].Bet >= _bjSettings.minimumBet && player.Cash >= _bjData.PlayerHands[0].Bet)
                             {
                                 //resetBJGame();
                                 
                                 //Console.Clear();
                                 changeState(GameState.Dealing);
+                                player.AddCashAndSave(-_bjData.PlayerHands[0].Bet);
                                 _bjSettings.mostRecentBet = _bjData.PlayerHands[0].Bet;
                             }
                             break;
@@ -57,7 +64,7 @@ namespace CardGames
                             if (_bjData.PlayerHands[0].Bet - _bjSettings.betIncrement >= 0m)
                             {
                                 _bjData.PlayerHands[0].Bet -= _bjSettings.betIncrement;
-                                player.AddCashAndSave(_bjSettings.betIncrement);
+                                //player.AddCashAndSave(_bjSettings.betIncrement);
                             }
                             break;
                         default: break;
@@ -66,6 +73,10 @@ namespace CardGames
 
                 // entry into either a new game or an ongoing one
                 case GameState.Dealing:
+                    // fail conditions
+                    if (_bjData == null || 
+                        _bjData.PlayerHands[0] == null || 
+                        (_bjData.PlayerHands[0].Bet < _bjSettings.minimumBet)) { changeState(GameState.Betting); return true; }
                     //////////// game logic    ////////////
                     ///
                     // does the player get to input this round?
@@ -327,11 +338,19 @@ namespace CardGames
                                 // same again
                                 default:
                                     resetBJGame();
-                                    if (player.Cash < _bjSettings.mostRecentBet) return false;
-                                    player.AddCashAndSave(-_bjSettings.mostRecentBet);
-                                    _bjData.PlayerHands[0].Bet = _bjSettings.mostRecentBet;
-                                    changeState(GameState.Dealing);
-                                    return true;
+                                    if (player.Cash < _bjSettings.mostRecentBet) 
+                                    { 
+                                        changeState(GameState.Betting); 
+                                        return true; 
+                                    }
+                                    else
+                                    {
+                                        player.AddCashAndSave(-_bjSettings.mostRecentBet);
+                                        _bjData.PlayerHands[0].Bet = _bjSettings.mostRecentBet;
+                                        changeState(GameState.Dealing);
+                                        return true;
+                                    }
+                                    
                             }
                         }
                         new string[1] { "Dealing..." }.PrintArrayToConsole(new IntVector2(Console.CursorLeft, Console.CursorTop), JustifyX.Center, JustifyY.Center);
@@ -822,7 +841,7 @@ namespace CardGames
             for (int i = 0; i < hands.Length; i++)
             {
                 if (hands[i].BHeld == false &&
-                    GetBlackJackValue(hands[i].Cards) < 21) return i;
+                    GetBlackJackValue(hands[i].Cards) <= 21) return i;
             }
             // no hand found
             return -1;
