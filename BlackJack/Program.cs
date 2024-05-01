@@ -6,7 +6,7 @@
         public static void Main()
         {
             aCard[] deck = GameCards.BJDeck();
-            PlayerSave? playerLoad = PlayerSave.Load();
+            PlayerSave? playerLoad = PlayerSave.LoadSecure();
             PlayerSave player = (playerLoad != null)? playerLoad : new PlayerSave(Environment.UserName.ToString(), 100.0m);
             Console.OutputEncoding = System.Text.Encoding.UTF8;
             int currentGame = -1;

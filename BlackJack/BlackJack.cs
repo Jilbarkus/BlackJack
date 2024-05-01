@@ -393,21 +393,23 @@ namespace CardGames
                                 return true;
                             // stay
                             case 2:
-                                // Case: player only has one hand and it has stayed, let dealer start
-                                if (_bjData.PlayerHands.Length <= 1)
-                                {
-                                    _bjData.PlayerHands[0].BHeld = true;
-                                    _bjData.dealerHand = _bjData.dealerHand.Append(Draw()).ToArray();
-                                }
-                                // Case player has split and can move on to next hand
-                                else if (_bjData.PlayerHands[playerHandIndex].BHeld == false)
-                                {
-                                    _bjData.PlayerHands[playerHandIndex].BHeld = true;
-                                    return true;
-                                }
+                                //// Case: player only has one hand and it has stayed, let dealer start
+                                //if (_bjData.PlayerHands.Length <= 1)
+                                //{
+                                //    _bjData.PlayerHands[0].BHeld = true;
+                                //    _bjData.dealerHand = _bjData.dealerHand.Append(Draw()).ToArray();
+                                //}
+                                //// Case player has split and can move on to next hand
+                                //else if (_bjData.PlayerHands[playerHandIndex].BHeld == false)
+                                //{
+                                //    _bjData.PlayerHands[playerHandIndex].BHeld = true;
+                                //    return true;
+                                //}
 
-                                Console.Clear();
-                                Console.WriteLine("Logic Error: attempting to stay on a hand that has already stayed");
+                                //Console.Clear();
+                                //Console.WriteLine("Logic Error: attempting to stay on a hand that has already stayed");
+                                //return true;
+                                _bjData.PlayerHands[playerHandIndex].BHeld = true;
                                 return true;
                             case 3:
                                 // check valid
@@ -814,7 +816,7 @@ namespace CardGames
         public static int FirstUsableHand(in BJHand[] hands)
         {
             if (hands == null || 
-                hands.Length <= 1)
+                hands.Length </*=*/ 1)
             { return 0; }
             
             for (int i = 0; i < hands.Length; i++)

@@ -20,7 +20,8 @@ namespace CardGames
             //return BestHandChooserTest();
             //return SplitViabilityTest();
             //return DeckValueTest();
-            return SaveLoadTest(player);
+            //return SaveLoadTest(player);
+            return EncrpytDecryptTest();
         }
 
         private bool BestHandChooserTest()
@@ -149,6 +150,44 @@ namespace CardGames
                 keyToChar = '-';
             }
             return keyToChar;
+        }
+
+        private string lastEncrypted = string.Empty;
+
+        private bool EncrpytDecryptTest()
+        {
+            while (true)
+            {
+                Console.WriteLine("press 1 for Encrypt");
+                Console.WriteLine("press 2 for Decrypt");
+                char usrInput = GetUserKeyToChar();
+                if (usrInput == 'x' || usrInput == 'X') return false;
+                if (!int.TryParse(usrInput.ToString(), out int usrChoice1)) continue;
+
+                if (usrChoice1 == 1)
+                {
+                    string? usrInput2 = Console.ReadLine();
+                    if (usrInput2 == null) continue;
+
+                    string encryptedInput = GlobalFunctions.Encrypt(usrInput2);
+                    lastEncrypted = encryptedInput;
+                    Console.WriteLine(encryptedInput);
+
+                }
+                else if (usrChoice1 == 2 && lastEncrypted.Length > 0)
+                {
+                    Console.WriteLine("Decrypting:");
+                    Console.WriteLine(GlobalFunctions.Decrypt(lastEncrypted));
+                }
+                else continue;
+            }
+        }
+
+        private static string _Val;
+        public static string Val
+        {
+            get { return _Val; }
+            set { _Val = value; }
         }
 
         private bool SaveLoadTest(PlayerSave player)

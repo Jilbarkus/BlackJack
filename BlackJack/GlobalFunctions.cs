@@ -1,4 +1,5 @@
 ﻿using System.Reflection;
+using System.Security.Cryptography;
 using System.Text;
 using static CardGames.BlackJack;
 //using static CardGames.ContentPage;
@@ -32,6 +33,9 @@ namespace CardGames
         public static IntVector2 ConsoleCursorLocation => new IntVector2(Console.CursorLeft, Console.CursorTop);
 
         public static string GetPlayerSavePath => Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData) + "\\csinoData.xml";
+
+        public static string DESKey16 => "chimmychanga1234";
+        public static string DESKey32 => "chimmychanga1234chimmychanga1234";
 
         // returns index of char that user inputed, if not valid then return -1
         public static int GetKeyPress(Char[] validChars)
@@ -963,6 +967,54 @@ $"  ┗┳┛\n";
             Array.Copy(array, 1, bufferArray, 0, pendingArrayLength);
             array = bufferArray;
             return array;
+        }
+
+        public static string Encrypt(string text)
+        {
+            byte[] iv = new byte[16];
+            byte[] array;
+            using (Aes aes = Aes.Create())
+            {
+                aes.Key = System.Text.Encoding.UTF8.GetBytes(GlobalFunctions.DESKey32);
+                aes.IV = iv;
+                ICryptoTransform encryptor = aes.CreateEncryptor(aes.Key, aes.IV);
+                using (MemoryStream ms = new MemoryStream())
+                {
+                    using (CryptoStream cryptoStream = new CryptoStream((Stream)ms, encryptor, CryptoStreamMode.Write))
+                    {
+                        using (StreamWriter streamWriter = new StreamWriter((Stream)cryptoStream))
+                        {
+                            streamWriter.Write(text);
+                        }
+                        array = ms.ToArray();
+                    }
+                }
+            }
+
+            return Convert.ToBase64String(array);
+        }
+
+
+        public static string Decrypt(string text)
+        {
+            byte[] iv = new byte[16];
+            byte[] buffer = Convert.FromBase64String(text);
+            using (Aes aes = Aes.Create())
+            {
+                aes.Key = Encoding.UTF8.GetBytes(GlobalFunctions.DESKey32);
+                aes.IV = iv;
+                ICryptoTransform decryptor = aes.CreateDecryptor(aes.Key, aes.IV);
+                using (MemoryStream ms = new MemoryStream(buffer))
+                {
+                    using (CryptoStream cryptoStream = new CryptoStream((Stream)ms, decryptor, CryptoStreamMode.Read))
+                    {
+                        using (StreamReader sr = new StreamReader(cryptoStream))
+                        {
+                            return sr.ReadToEnd();
+                        }
+                    }
+                }
+            }
         }
 
         //public static string[] AddCardsToStringArray(this in string[] stringArrayIn, in aCard[] cardsIn, int maxLengthX = -1)
